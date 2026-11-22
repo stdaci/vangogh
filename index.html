@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ван Гог – графичко студио и печатница</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ink: #070f2e;
+      --deep: #0d1b4c;
+      --blue: #2f6bc4;
+      --sky: #8fc3e8;
+      --sun: #f5c842;
+      --cream: #fff3b0;
+      --text: #eef4ff;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      color-scheme: dark;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 70px;
+      background: var(--ink);
+    }
+
+    *, *::before, *::after { box-sizing: inherit; }
+
+    /* ВАЖНО: body мора да е transparent, инаку ја крие сликата позади */
+    body {
+      margin: 0;
+      font-family: Jost, system-ui, sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--text);
+      background: transparent;
+    }
+
+    /* Анимирана позадина (две платна: боја + ѕвезди) */
+    #sky, #fg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+
+    /* Хедер */
+    header {
+      position: fixed;
+      top: env(safe-area-inset-top, 0px);
+      left: 0;
+      right: 0;
+      z-index: 5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 5vw;
+      background: linear-gradient(rgba(7,15,46,.85), rgba(7,15,46,0));
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      color: var(--sun);
+      text-decoration: none;
+    }
+
+    nav { display: flex; gap: clamp(12px, 3vw, 32px); }
+    nav a { text-decoration: none; font-weight: 500; font-size: .95rem; }
+    nav a:hover { color: var(--sun); }
+
+    section {
+      padding: 90px 5vw;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 110px;
+    }
+
+    .title {
+      font-weight: 900;
+      font-size: clamp(3.4rem, 13vw, 9.5rem);
+      letter-spacing: .01em;
+      color: var(--sun);
+      text-shadow: 4px 4px 0 #8a5409, 0 8px 30px rgba(0,0,0,.6);
+    }
+
+    .sub {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 700;
+      font-size: clamp(1.3rem, 3.6vw, 2.2rem);
+      margin: .4em 0 .6em;
+      color: var(--cream);
+    }
+
+    .lead { max-width: 34ch; font-size: 1.2rem; text-shadow: 0 2px 12px #000; }
+
+    .btns { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+
+    .btn {
+      padding: 13px 26px;
+      border-radius: 40px 12px 40px 12px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 2px solid var(--sun);
+      transition: transform .2s, background .2s;
+    }
+    .btn.main { background: var(--sun); color: var(--ink); }
+    .btn:hover { transform: translateY(-3px) rotate(-1deg); }
+
+    
+    @media (max-width: 700px) { .cmyk { opacity: .35; top: 12vh; } }
+
+    h2 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      color: var(--cream);
+      margin-bottom: .3em;
+      letter-spacing: .01em;
+      text-shadow: 4px 4px 0 #8a5409, 0 3px 14px rgba(1, 7, 130, 0.6);
+    }
+
+    .intro { max-width: 60ch; margin-bottom: 40px; text-shadow: 0 2px 10px #000; }
+
+    /* Производи */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 22px;
+    }
+
+    .panel, .card {
+      background: rgba(8,16,46,.66);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(245,200,66,.32);
+    }
+
+    .card {
+      padding: 26px;
+      border-radius: 6px 28px 6px 28px;
+      transition: border-color .2s;
+    }
+    .card:hover { border-color: var(--sun); }
+    .card h3 { font-size: 1.4rem; color: var(--sun); margin: 14px 0 6px; }
+    .card p { margin: 0; font-size: 1rem; color: #d6e3ff; }
+
+    /* Илустрации што се „цртаат“ при скрол */
+    .ill {
+      width: 84px;
+      height: 84px;
+      fill: none;
+      stroke: var(--sun);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .ill * { stroke-dasharray: 1; stroke-dashoffset: 1; }
+    .card.in .ill * { animation: draw 1.6s ease forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+
+    /* За нас */
+    .about {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 30px;
+      align-items: center;
+    }
+    @media (max-width: 800px) { .about { grid-template-columns: 1fr; } }
+
+    .panel { padding: 34px; border-radius: 30px 6px 30px 6px; }
+    .panel p { margin: .5em 0; }
+
+    .steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+    .steps li {
+      counter-increment: s;
+      display: flex;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px dashed rgba(245,200,66,.3);
+    }
+    .steps li::before {
+      content: counter(s);
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 2rem;
+      color: var(--sun);
+      min-width: 2ch;
+    }
+    .steps b { display: block; font-size: 1.1rem; }
+
+    /* Контакт */
+    .contact {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 22px;
+    }
+    .contact .panel { padding: 24px; }
+    .contact h3 { color: var(--sun); font-size: 1.2rem; margin-bottom: 6px; }
+
+    footer {
+      text-align: center;
+      padding: 40px 5vw 60px;
+      color: var(--sky);
+      font-size: .95rem;
+      text-shadow: 0 2px 8px #000;
+    }
+
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .8s, transform .8s; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .ill * { stroke-dashoffset: 0; }
+      .card.in .ill * { animation: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <canvas id="fg" aria-hidden="true"></canvas>
+
+  <header>
+    <a class="logo" href="#top">Ван Гог</a>
+    <nav>
+      <a href="#proizvodi">Производи</a>
+      <a href="#rabota">Зошто ние?</a>
+      <a href="#kontakt">Контакт</a>
+    </nav>
+  </header>
+
+  <main id="top">
+
+    <section class="hero">
+      <h1 class="title" id="title">Ван Гог</h1>
+      <p class="sub">Графичко студио и печатница</p>
+      <p class="lead">Дизајнираме и го печатиме она што ве прави посебни.</p>
+      <div class="btns">
+        <a class="btn main" href="#proizvodi">Погледнете што печатиме</a>
+        <a class="btn" href="#kontakt">Јавете ни се</a>
+      </div>
+    </section>
+
+    <section id="proizvodi">
+      <h2 class="reveal">Што печатиме и дизајнираме</h2>
+      <p class="intro reveal">Дигитален и офсет печат, мали и големи формати. Ви треба само идеја – ние го правиме остатокот.</p>
+
+      <div class="grid">
+        <article class="card">
+          <svg class="ill" viewBox="0 0 120 120"><rect x="18" y="30" width="70" height="42" rx="3"/><rect x="36" y="52" width="70" height="42" rx="3"/><path d="M46 66h30M46 78h18"/></svg>
+          <h3>Визит-картички</h3>
+          <p>Класични, лакирани и со посебни хартии, за прв впечаток што останува.</p>
+        </article>
+
+        <article class="card">
+          <svg class="ill" viewBox="0 0 120 120"><path d="M20 25l27 6v66l-27-6zM47 31l27-6v66l-27 6zM74 25l27 6v66l-27-6z"/></svg>
+          <h3>Летоци и брошури</h3>
+          <p>Преклопливи брошури и каталози според вашите барања.</p>
+        </article>
+
+        <article class="card">
+          <svg class="ill" viewBox="0 0 120 120"><rect x="12" y="22" width="96" height="50" rx="3"/><path d="M40 72v32M80 72v32M30 104h20M70 104h20M26 40h40M26 54h26"/></svg>
+          <h3>Банери</h3>
+          <p>Печат во голем формат за надворешен и внатрешен дизајн.</p>
+        </article>
+
+        <article class="card">
+          <svg class="ill" viewBox="0 0 120 120"><circle cx="60" cy="60" r="38"/><path d="M60 22a38 38 0 0 1 38 38H74z"/><path d="M60 42l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z"/></svg>
+          <h3>Налепници</h3>
+          <p>Налепници и етикети во секој облик, за производи и возила.</p>
+        </article>
+
+        <article class="card">
+          <svg class="ill" viewBox="0 0 120 120"><path d="M60 18l40 18v46l-40 20-40-20V36zM20 36l40 18 40-18M60 54v48"/></svg>
+          <h3>Амбалажа</h3>
+          <p>Кутии и кеси со вашето лого, направени по мерка.</p>
+        </article>
+
+        <article class="card">
+          <svg class="ill" viewBox="0 0 120 120"><rect x="22" y="26" width="76" height="72" rx="4"/><path d="M22 46h76M42 18v16M78 18v16M38 62h8M56 62h8M74 62h8M38 78h8M56 78h8"/></svg>
+          <h3>Календари</h3>
+          <p>Ѕидни, бирото и џебни календари со вашиот дизајн.</p>
+        </article>
+
+        <article class="card">
+          <svg class="ill" viewBox="0 0 120 120"><path d="M42 22l-26 14 10 18 10-5v44h48V49l10 5 10-18-26-14c-4 8-12 10-18 10s-14-2-18-10z"/></svg>
+          <h3>Мајици и кружки</h3>
+          <p>Печат на текстил и подароци за тимови, настани и фирми.</p>
+        </article>
+
+        <article class="card">
+          <svg class="ill" viewBox="0 0 120 120"><path d="M60 16l24 36-24 52-24-52zM60 52v20"/><circle cx="60" cy="76" r="4"/></svg>
+          <h3>Лого и дизајн</h3>
+          <p>Креирање лого, визуелен идентитет и подготовка за печат.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="rabota">
+      <div class="about">
+        <div class="panel reveal">
+          <h2>Зошто Ван Гог?</h2>
+          <p>Ван Гог ја видел ноќта како вител од боја. Така и ние гледаме во секоја нарачка повеќе од црно на бело.</p>
+          <p>Силни бои, прецизен потег и печат што се забележува – тоа е нашиот занает.</p>
+        </div>
+        <ol class="steps panel reveal">
+          <li><span><b>Идеја</b>Разговараме што ви треба.</span></li>
+          <li><span><b>Дизајн</b>Подготвуваме решение и пробна верзија.</span></li>
+          <li><span><b>Печат</b>Печатиме и ја проверуваме секоја серија.</span></li>
+          <li><span><b>Испорака</b>Преземате или ви носиме до врата.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="kontakt">
+      <h2 class="reveal">Јавете ни се</h2>
+      <div class="contact">
+        <div class="panel reveal"><h3>Адреса</h3>[Улица и број], Скопје</div>
+        <div class="panel reveal"><h3>Телефон</h3><a href="tel:+38970000000">+389 70 536 568</a></div>
+        <div class="panel reveal"><h3>Е-пошта</h3><a href="mailto:info@example.mk">vangogh@t.mk</a></div>
+        <div class="panel reveal"><h3>Работно време</h3>Пон–Нед: <br>[08:00–19:00]</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>© 2026 Ван Гог – графичко студио и печатница</footer>
+
+  <script>
+    (function () {
+      var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+      /* Илустрации што се цртаат + појавување при скрол */
+      document.querySelectorAll('.ill *').forEach(function (e) { e.setAttribute('pathLength', 1); });
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+      }, { threshold: .2 });
+      document.querySelectorAll('.card,.reveal').forEach(function (e) { io.observe(e); });
+
+      /* Анимирана „Ѕвездена ноќ“ позадина */
+      var cv = document.getElementById('sky'), ctx = cv.getContext('2d');
+      var fg = document.getElementById('fg'), f = fg.getContext('2d');
+      var W, H, P = [], grad;
+
+      // Центри на вителците: [x, y, радиус] (како дел од ширина/висина)
+      var SW = [[.62, .3, .16], [.3, .4, .12], [.8, .7, .1]];
+
+      // Бои на потезите
+      var COL = ['#16306f', '#1f4aa0', '#2f6bc4', '#5a9ad8', '#8fc3e8', '#fff3b0', '#f5c842'];
+
+      // Ѕвезди: [x, y, големина]
+      var stars = [
+        [.15, .12, 22], [.35, .2, 16], [.5, .1, 26], [.72, .2, 20], [.9, .38, 18],
+        [.25, .45, 14], [.6, .42, 24], [.82, .62, 16], [.08, .62, 18], [.42, .72, 14]
+      ];
+
+      function R(a, b) { return a + Math.random() * (b - a); }
+
+      // Насока на потегот во точка (x, y)
+      function ang(x, y, t) {
+        var a = Math.sin(x * .006 + t * .00025) * Math.cos(y * .007 - t * .0002) * 2;
+        var M = Math.max(W, H);
+        for (var i = 0; i < SW.length; i++) {
+          var s = SW[i], dx = x - s[0] * W, dy = y - s[1] * H, r = s[2] * M;
+          var k = Math.exp(-(dx * dx + dy * dy) / (r * r));
+          a += k * (Math.atan2(dy, dx) + 1.57 - a) * .95;
+        }
+        return a;
+      }
+
+      function spawn(p) {
+        p.x = R(0, W); p.y = R(0, H);
+        p.w = R(3, 8);      // дебелина на потег
+        p.s = R(1, 2.2);    // брзина
+        p.o = R(-.3, .3);   // варијација на боја
+        p.l = R(150, 400);  // траење
+      }
+
+      function size() {
+        W = innerWidth; H = innerHeight;
+        var d = Math.min(devicePixelRatio || 1, 1.5);
+        [cv, fg].forEach(function (c) { c.width = W * d; c.height = H * d; });
+        ctx.setTransform(d, 0, 0, d, 0, 0);
+        f.setTransform(d, 0, 0, d, 0, 0);
+
+        grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#0a1440');
+        grad.addColorStop(.6, '#143073');
+        grad.addColorStop(1, '#1c4a98');
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        var n = Math.min(2200, Math.round(W * H / 900)); // број на потези
+        P = [];
+        for (var i = 0; i < n; i++) { var p = {}; spawn(p); P.push(p); }
+        for (var k = 0; k < 160; k++) step(k * 16);      // однапред наслика
+      }
+
+      function step(t) {
+        ctx.globalAlpha = .07;            // бледење = траг од четка
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+        ctx.globalAlpha = .6;
+        ctx.lineCap = 'round';
+        for (var i = 0; i < P.length; i++) {
+          var p = P[i], a = ang(p.x, p.y, t);
+          var nx = p.x + Math.cos(a) * p.s, ny = p.y + Math.sin(a) * p.s;
+          var c = .5 + .5 * Math.sin(p.x * .01 + p.y * .013) + p.o;
+          var ci = Math.max(0, Math.min(COL.length - 1, Math.floor(c * COL.length * .9)));
+          ctx.strokeStyle = COL[ci];
+          ctx.lineWidth = p.w;
+          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(nx, ny); ctx.stroke();
+          p.x = nx; p.y = ny;
+          if (--p.l <= 0 || nx < -20 || nx > W + 20 || ny < -20 || ny > H + 20) spawn(p);
+        }
+      }
+
+      function halo(x, y, r, q) {
+        var g = f.createRadialGradient(x, y, 0, x, y, r * 3.4 * q);
+        g.addColorStop(0, 'rgba(255,243,176,.95)');
+        g.addColorStop(.25, 'rgba(245,200,66,.5)');
+        g.addColorStop(1, 'rgba(245,200,66,0)');
+        f.fillStyle = g;
+        f.beginPath(); f.arc(x, y, r * 3.4 * q, 0, 6.3); f.fill();
+        f.strokeStyle = 'rgba(255,243,176,.35)';
+        f.lineWidth = 2;
+        for (var i = 1; i < 3; i++) { f.beginPath(); f.arc(x, y, r * (1 + i * .6) * q, 0, 6.3); f.stroke(); }
+        f.fillStyle = '#fff3b0';
+        f.beginPath(); f.arc(x, y, r * .4, 0, 6.3); f.fill();
+      }
+
+      function cypress() {
+        var x = W * .07, b = H * 1.02, h = H * .8;
+        f.fillStyle = '#050b22';
+        f.beginPath();
+        f.moveTo(x - 10, b);
+        f.bezierCurveTo(x - 80, b - h * .25, x - 55, b - h * .55, x - 20, b - h * .8);
+        f.bezierCurveTo(x - 6, b - h * .92, x + 4, b - h * .99, x + 10, b - h * .65);
+        f.bezierCurveTo(x + 16, b - h * .9, x + 66, b - h * .4, x + 76, b - h * .15);
+        f.lineTo(x + 96, b);
+        f.fill();
+      }
+
+      function overlay(t) {
+        f.clearRect(0, 0, W, H);
+        stars.forEach(function (s, k) {
+          halo(s[0] * W, s[1] * H, s[2], 1 + (reduce ? 0 : .1 * Math.sin(t / 700 + k * 2)));
+        });
+        // месечина
+        var mx = .88 * W, my = .12 * H;
+        f.fillStyle = '#f5c842';
+        f.beginPath();
+        f.arc(mx, my, 34, -1.3, 1.3);
+        f.arc(mx + 18, my, 28, 1.1, -1.1, true);
+        f.fill();
+        cypress();
+      }
+
+      function frame(t) { step(t); overlay(t); requestAnimationFrame(frame); }
+
+      var rt;
+      addEventListener('resize', function () {
+        clearTimeout(rt);
+        rt = setTimeout(function () { size(); overlay(0); }, 250);
+      });
+
+      size();
+      overlay(0);
+      if (!reduce) requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>
